@@ -78,11 +78,18 @@ export const Classics: React.FC = () => {
                   <div
                     className={`absolute -bottom-4 ${
                       isEven ? '-left-3' : '-right-3'
-                    } z-20 bg-mustard text-dark px-4 py-2 rounded-lg border-2 border-dark font-display font-black text-2xl uppercase tracking-wider shadow-brutal rotate-${
+                    } z-20 bg-mustard text-dark px-4 py-2 rounded-xl border-2 border-dark shadow-brutal flex flex-col items-center leading-none rotate-${
                       isEven ? '3' : '-3'
                     }`}
                   >
-                    {burger.price}
+                    <span className="font-display font-black text-2xl uppercase tracking-wider">
+                      {burger.price}
+                    </span>
+                    {burger.menuPrice && (
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ketchup -mt-0.5">
+                        Menü {burger.menuPrice}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -120,7 +127,7 @@ export const Classics: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-4">
                     <a
                       href={`${siteConfig.contact.whatsappBaseUrl}?text=${encodeURIComponent(
-                        `Hallo VUR Burger, ich möchte gerne bestellen:\n1x ${burger.name} (${burger.price})`
+                        `Hallo VUR Burger, ich möchte gerne bestellen:\n1x ${burger.name} (${burger.price}${burger.menuPrice ? ` / als Menü ${burger.menuPrice}` : ''})`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
