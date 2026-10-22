@@ -62,72 +62,68 @@ export const Gallery: React.FC = () => {
             </div>
           </div>
           <p className="mt-4 md:mt-0 text-paper/70 max-w-md font-body text-base sm:text-lg">
-            Heißer Grill, krosse Pommes, schmelzender Käse. Klicke auf ein Bild, um es in voller Größe zu betrachten.
+            Heißer Grill, krosse Pommes, schmelzender Käse. Klicke auf ein Bild, um es in voller Größe unbeschnitten zu betrachten.
           </p>
         </div>
 
-        {/* Masonry / Editorial Staggered Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {items.map((item, index) => {
-            // Give varied aspect ratios for an editorial magazine feel
-            const isWide = index === 0 || index === 7;
-            const aspect = isWide ? 'landscape' : index % 3 === 0 ? 'portrait' : 'square';
+        {/* Clean, Uniform Staggered Grid (Every image properly in frame) */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+          {items.map((item, index) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.35, delay: (index % 4) * 0.08 }}
+              onClick={() => setSelectedItemIndex(index)}
+              className="relative group cursor-pointer"
+            >
+              <div className="rounded-xl overflow-hidden border-2 border-dark-border group-hover:border-mustard transition-all duration-300 bg-dark-surface shadow-md">
+                <PhotoSlot
+                  src={item.photoSlot}
+                  alt={item.title}
+                  label={item.title}
+                  aspectRatio="portrait"
+                  objectFit="cover"
+                  objectPosition="center"
+                  enableParallax={false}
+                  className="w-full h-full"
+                />
+              </div>
 
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.4, delay: (index % 4) * 0.1 }}
-                onClick={() => setSelectedItemIndex(index)}
-                className={`relative group cursor-pointer ${
-                  isWide ? 'sm:col-span-2' : 'col-span-1'
-                }`}
-              >
-                <div className="rounded-xl overflow-hidden border-2 border-dark-border group-hover:border-mustard transition-colors bg-dark-surface shadow-md">
-                  <PhotoSlot
-                    src={item.photoSlot}
-                    alt={item.title}
-                    label={item.title}
-                    aspectRatio={aspect}
-                    enableParallax={false}
-                    className="w-full h-full"
-                  />
-                </div>
-
-                {/* Hover / Tap Overlay info */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex flex-col justify-end p-4 pointer-events-none">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-mustard">
-                    {item.tag}
+              {/* Hover / Tap Overlay info */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl flex flex-col justify-end p-3 sm:p-4 pointer-events-none">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-mustard">
+                  {item.tag}
+                </span>
+                <div className="flex items-center justify-between">
+                  <span className="font-display font-black text-base sm:text-lg text-paper uppercase leading-tight">
+                    {item.title}
                   </span>
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-black text-lg text-paper uppercase">
-                      {item.title}
-                    </span>
-                    <ZoomIn className="w-4 h-4 text-mustard" />
-                  </div>
-                  <span className="text-xs text-paper/70 font-body">{item.subtitle}</span>
+                  <ZoomIn className="w-4 h-4 text-mustard shrink-0 ml-1" />
                 </div>
-              </motion.div>
-            );
-          })}
+                <span className="text-xs text-paper/75 font-body line-clamp-1 mt-0.5">
+                  {item.subtitle}
+                </span>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal (Uncropped, Full POV) */}
       <AnimatePresence>
         {selectedItemIndex !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
             onClick={() => setSelectedItemIndex(null)}
           >
             {/* Top Bar with Close */}
-            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-3">
-              <span className="text-xs font-mono text-paper/60 uppercase">
+            <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 flex items-center gap-3">
+              <span className="text-xs font-mono text-paper/70 uppercase bg-dark/80 px-2.5 py-1 rounded border border-white/10">
                 {selectedItemIndex + 1} / {items.length}
               </span>
               <button
@@ -135,7 +131,7 @@ export const Gallery: React.FC = () => {
                   e.stopPropagation();
                   setSelectedItemIndex(null);
                 }}
-                className="p-2.5 rounded-full bg-dark-card border border-white/20 text-paper hover:text-mustard hover:border-mustard transition-colors"
+                className="p-2.5 rounded-full bg-dark/80 border border-white/20 text-paper hover:text-mustard hover:border-mustard transition-colors"
                 aria-label="Galerie schließen"
               >
                 <X className="w-6 h-6" />
@@ -148,7 +144,7 @@ export const Gallery: React.FC = () => {
                 e.stopPropagation();
                 handlePrev();
               }}
-              className="absolute left-3 sm:left-6 z-20 p-3 rounded-full bg-dark-card/80 border border-white/10 text-paper hover:text-mustard hover:bg-dark transition-all"
+              className="absolute left-2 sm:left-6 z-30 p-3 rounded-full bg-dark/80 border border-white/20 text-paper hover:text-mustard hover:bg-dark transition-all"
               aria-label="Vorheriges Bild"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -160,37 +156,34 @@ export const Gallery: React.FC = () => {
                 e.stopPropagation();
                 handleNext();
               }}
-              className="absolute right-3 sm:right-6 z-20 p-3 rounded-full bg-dark-card/80 border border-white/10 text-paper hover:text-mustard hover:bg-dark transition-all"
+              className="absolute right-2 sm:right-6 z-30 p-3 rounded-full bg-dark/80 border border-white/20 text-paper hover:text-mustard hover:bg-dark transition-all"
               aria-label="Nächstes Bild"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
 
-            {/* Active Item Container */}
+            {/* Active Item Container (Uncropped, Full View) */}
             <div
-              className="relative max-w-4xl w-full mx-auto max-h-[85vh] flex flex-col items-center"
+              className="relative max-w-3xl w-full mx-auto max-h-[90vh] flex flex-col items-center justify-center p-2"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-full max-h-[70vh] rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-dark-surface">
-                <PhotoSlot
+              <div className="w-full max-h-[75vh] flex items-center justify-center rounded-xl overflow-hidden border border-white/15 bg-black/50 shadow-2xl">
+                <img
                   src={items[selectedItemIndex].photoSlot}
                   alt={items[selectedItemIndex].title}
-                  label={items[selectedItemIndex].title}
-                  aspectRatio="auto"
-                  enableParallax={false}
-                  className="w-full h-full min-h-[350px] max-h-[68vh]"
+                  className="max-h-[72vh] w-auto max-w-full object-contain rounded-lg"
                 />
               </div>
 
               {/* Caption Bar */}
-              <div className="mt-4 text-center">
-                <span className="text-xs font-mono text-mustard uppercase tracking-widest">
+              <div className="mt-3 text-center px-4">
+                <span className="text-xs font-mono text-mustard uppercase tracking-widest font-bold">
                   {items[selectedItemIndex].tag}
                 </span>
-                <h3 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-wide text-paper mt-0.5">
+                <h3 className="font-display font-black text-2xl sm:text-3xl uppercase tracking-wide text-paper mt-0.5 leading-none">
                   {items[selectedItemIndex].title}
                 </h3>
-                <p className="text-sm text-paper/70 font-body">
+                <p className="text-xs sm:text-sm text-paper/70 font-body mt-1">
                   {items[selectedItemIndex].subtitle}
                 </p>
               </div>

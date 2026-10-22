@@ -165,8 +165,10 @@ export const FindUs: React.FC = () => {
                   src="/images/location.jpg"
                   alt="VUR Burger Standort Germersheim"
                   label="VUR Burger Vor Ort"
-                  aspectRatio="video"
-                  className="w-full sm:min-h-[280px]"
+                  aspectRatio="landscape"
+                  objectFit="cover"
+                  objectPosition="center"
+                  className="w-full"
                 />
 
                 {/* Map Interactive Pin Overlay */}

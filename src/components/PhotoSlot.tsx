@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Camera, ImageOff, Sparkles } from 'lucide-react';
 
@@ -7,6 +7,8 @@ interface PhotoSlotProps {
   alt: string;
   label?: string;
   aspectRatio?: 'square' | 'video' | 'portrait' | 'landscape' | 'banner' | 'auto';
+  objectFit?: 'cover' | 'contain';
+  objectPosition?: string;
   className?: string;
   priority?: boolean;
   enableParallax?: boolean;
@@ -18,29 +20,46 @@ export const PhotoSlot: React.FC<PhotoSlotProps> = ({
   src,
   alt,
   label,
-  aspectRatio = 'landscape',
+  aspectRatio = 'portrait',
+  objectFit = 'cover',
+  objectPosition = 'center',
   className = '',
-  enableParallax = true,
+  enableParallax = false,
   onClick,
   badge,
 }) => {
   const [hasError, setHasError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  // Parallax Setup
-  const containerRef = React.useRef<HTMLDivElement>(null);
+  // Parallax Setup (subtle, 0 to 2% max so image stays perfectly in frame)
+  const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   });
 
-  const parallaxY = useTransform(scrollYProgress, [0, 1], enableParallax ? ['-6%', '6%'] : ['0%', '0%']);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.08, 1, 1.05]);
+  const parallaxY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    enableParallax ? ['-2%', '2%'] : ['0%', '0%']
+  );
 
-  const aspectClassMap = {
+  // Check if image is already cached / completed on mount
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      if (imgRef.current.naturalWidth > 0) {
+        setIsLoaded(true);
+      } else {
+        setHasError(true);
+      }
+    }
+  }, [src]);
+
+  const aspectClassMap: Record<string, string> = {
     square: 'aspect-square',
     video: 'aspect-video',
-    portrait: 'aspect-[3/4]',
+    portrait: 'aspect-[4/5] sm:aspect-[3/4]',
     landscape: 'aspect-[4/3]',
     banner: 'aspect-[21/9]',
     auto: '',
@@ -53,7 +72,9 @@ export const PhotoSlot: React.FC<PhotoSlotProps> = ({
     <div
       ref={containerRef}
       onClick={onClick}
-      className={`relative overflow-hidden group select-none bg-dark-surface border border-dark-border rounded-xl ${aspectClassMap[aspectRatio]} ${className}`}
+      className={`relative overflow-hidden group select-none bg-[#141414] border border-dark-border rounded-xl ${
+        aspectClassMap[aspectRatio] || ''
+      } ${className}`}
     >
       {/* Optional Badge */}
       {badge && (
@@ -68,32 +89,30 @@ export const PhotoSlot: React.FC<PhotoSlotProps> = ({
       {/* Actual Image Tag */}
       {!hasError && (
         <motion.div
-          style={{ y: parallaxY, scale }}
-          className="w-full h-full relative"
+          style={{ y: parallaxY }}
+          className="w-full h-full relative flex items-center justify-center"
         >
           <img
+            ref={imgRef}
             src={src}
             alt={alt}
             onError={() => setHasError(true)}
             onLoad={() => setIsLoaded(true)}
             loading="lazy"
-            className={`w-full h-full object-cover transition-all duration-700 ease-out ${
-              isLoaded ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-sm'
+            style={{ objectPosition }}
+            className={`w-full h-full ${
+              objectFit === 'contain' ? 'object-contain max-h-full' : 'object-cover'
+            } transition-opacity duration-300 ${
+              isLoaded ? 'opacity-100' : 'opacity-0'
             }`}
           />
         </motion.div>
       )}
 
-      {/* Elegant Fallback / Placeholder Box */}
-      {(hasError || !isLoaded) && (
-        <div
-          className={`absolute inset-0 flex flex-col justify-between p-4 sm:p-5 transition-opacity duration-300 ${
-            hasError ? 'opacity-100 z-10' : 'opacity-100 pointer-events-none'
-          } bg-gradient-to-br from-[#1C1C1C] via-[#161616] to-[#0F0F0F] text-paper/80`}
-        >
-          {/* Subtle Halftone & Grid overlay */}
+      {/* Elegant Fallback Placeholder (shown only on genuine error or while initial loading) */}
+      {hasError && (
+        <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-5 z-10 bg-gradient-to-br from-[#1C1C1C] via-[#161616] to-[#0F0F0F] text-paper/80">
           <div className="absolute inset-0 bg-grain-dark opacity-30 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(#F6B21B_0.75px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
 
           {/* Top Row: Slot ID */}
           <div className="relative z-10 flex items-center justify-between">
@@ -108,7 +127,7 @@ export const PhotoSlot: React.FC<PhotoSlotProps> = ({
 
           {/* Center: Stylized Food Icon & Label */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center my-auto py-3">
-            <div className="w-12 h-12 rounded-full bg-dark/80 border border-white/10 flex items-center justify-center mb-2 shadow-inner group-hover:scale-105 transition-transform">
+            <div className="w-12 h-12 rounded-full bg-dark/80 border border-white/10 flex items-center justify-center mb-2 shadow-inner">
               <ImageOff className="w-5 h-5 text-mustard/70" />
             </div>
             <p className="font-display uppercase text-lg sm:text-xl tracking-wider text-paper">
@@ -119,16 +138,16 @@ export const PhotoSlot: React.FC<PhotoSlotProps> = ({
             </p>
           </div>
 
-          {/* Bottom Bar: Instructions */}
+          {/* Bottom Bar */}
           <div className="relative z-10 flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-paper/40 font-mono">
             <span>{aspectRatio.toUpperCase()}</span>
-            <span>DATEI WIRD ERWARTET</span>
+            <span>BILD WIRD ERWARTET</span>
           </div>
         </div>
       )}
 
       {/* Subtle hover gleam / vignette */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
     </div>
   );
 };

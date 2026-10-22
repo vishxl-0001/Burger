@@ -63,13 +63,13 @@ export const Classics: React.FC = () => {
                   />
 
                   {/* Tilt container */}
-                  <div className="relative z-10 rounded-2xl overflow-hidden border-3 border-dark bg-dark-surface shadow-xl transition-transform duration-300 hover:scale-[1.02] active:scale-[0.99]">
+                  <div className="relative z-10 rounded-2xl overflow-hidden border-3 border-dark bg-dark-surface shadow-xl transition-transform duration-300 hover:scale-[1.01] active:scale-[0.99]">
                     <PhotoSlot
                       src={burger.photoSlot}
                       alt={burger.name}
                       label={burger.name}
-                      aspectRatio="landscape"
-                      className="w-full sm:min-h-[360px]"
+                      aspectRatio="portrait"
+                      className="w-full max-h-[480px]"
                       badge={burger.badge}
                     />
                   </div>

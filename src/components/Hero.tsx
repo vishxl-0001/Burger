@@ -170,7 +170,8 @@ export const Hero: React.FC = () => {
                 alt="VUR Burger Spezialität"
                 label="Hero Burger Frisch Vom Grill"
                 aspectRatio="portrait"
-                className="w-full sm:min-h-[440px]"
+                objectPosition="50% 35%"
+                className="w-full max-h-[560px]"
                 badge="VUR SIGNATURE"
               />
             </div>
