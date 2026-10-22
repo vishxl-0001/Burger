@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #F4EDE0;
+  --paper-light: #FCF9F5;
+  --paper-dark: #E4D7BE;
+  --dark: #121212;
+  --dark-surface: #1A1A1A;
+  --dark-card: #222222;
+  --dark-border: #2E2E2E;
+  --ketchup: #D62828;
+  --ketchup-dark: #AA1B1B;
+  --mustard: #F6B21B;
+  --mustard-light: #FCE195;
+  --mustard-dark: #D49306;
+}
+
+/* Reduzierte Animationen respektieren */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Subtle paper texture overlay */
+.bg-grain {
+  background-image: radial-gradient(rgba(18, 18, 18, 0.08) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.bg-grain-dark {
+  background-image: radial-gradient(rgba(244, 237, 224, 0.07) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Halftone dot pattern */
+.bg-halftone {
+  background-image: radial-gradient(currentColor 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+
+/* Jagged torn paper edge (CSS / SVG mask) */
+.torn-top {
+  clip-path: polygon(
+    0% 0%, 5% 12px, 10% 0%, 15% 14px, 20% 0%, 25% 10px, 30% 0%, 35% 12px, 
+    40% 0%, 45% 15px, 50% 0%, 55% 12px, 60% 0%, 65% 14px, 70% 0%, 75% 11px, 
+    80% 0%, 85% 13px, 90% 0%, 95% 10px, 100% 0%, 
+    100% 100%, 0% 100%
+  );
+}
+
+.torn-bottom {
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% 100%,
+    95% calc(100% - 12px), 90% 100%, 85% calc(100% - 15px), 80% 100%, 75% calc(100% - 11px),
+    70% 100%, 65% calc(100% - 14px), 60% 100%, 55% calc(100% - 12px), 50% 100%,
+    45% calc(100% - 13px), 40% 100%, 35% calc(100% - 12px), 30% 100%, 25% calc(100% - 10px),
+    20% 100%, 15% calc(100% - 14px), 10% 100%, 5% calc(100% - 12px), 0% 100%
+  );
+}
+
+/* Receipt / Ticket Zig-zag Edge */
+.zigzag-bottom {
+  background-image: 
+    linear-gradient(-45deg, transparent 10px, var(--paper) 10px),
+    linear-gradient(45deg, transparent 10px, var(--paper) 10px);
+  background-position: left bottom;
+  background-repeat: repeat-x;
+  background-size: 20px 20px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E2E2E;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D62828;
+}
+
+/* Dotted leader for menu receipt */
+.menu-dots {
+  background-image: radial-gradient(circle, currentColor 1px, transparent 1.5px);
+  background-size: 6px 100%;
+  background-repeat: repeat-x;
+  background-position: bottom 6px left;
+}
+
+/* Smooth text selection */
+::selection {
+  background-color: #D62828;
+  color: #F4EDE0;
+}
